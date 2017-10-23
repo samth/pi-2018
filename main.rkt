@@ -1,7 +1,7 @@
 #lang slideshow
 
 (require slideshow/step slideshow/code slideshow/face 
-         ppict/2
+         ppict/2 pict/shadow
          (only-in slideshow/slide title-size)
          "config.ss"
          (except-in "beamer.ss" title) "lib.ss" "thanks.ss" 
@@ -58,19 +58,53 @@
 
 (play-n #:layout 'center
         #:skip-first? #t
-        (lambda (ts flow titan)
+        (lambda (ts flow titan unsound)
           (ppict-do full-page
            #:go (coord .5 .5 'cc)
            (cellophane (scale (bitmap "typescript.png") .9) ts)
            #:go (coord .5 .5 'cc)
            (cellophane (scale (bitmap "flow.png") .9) flow)
            #:go (coord .5 .5 'cc)
-           (cellophane (scale (bitmap "titan.png") .9) titan))))
+           (cellophane (scale (bitmap "titan.png") .9) titan)
+           #:go (coord .5 .5 'cc)
+           (if (= unsound 1)
+               (rotate (shadow-frame (t/cant "All Unsound!" size1)) .5)
+               (blank 1)))))
+
+(define (quoted author ts)
+  (vr-append (apply vl-append (for/list ([t ts])
+                                (t/cant t size2)))
+             (blank 30)
+             (t/kau (string-append "" author) size2)))
+
+(slide (quoted "Vincent St. Amour, Dec. 2015"
+               '("Interfacing Typed Racket and Racket code"
+                 "may involve a lot of dynamic checks, which"
+                 "can have significant overhead, and cause"
+                 "that kind of stuttering.")))
+
+(slide (quoted "Neil Toronto, May 2015"
+               '("It's very slow."
+                 ""
+                 "It looks like it has to do with a dc<%>"
+                 "instance crossing from untyped to"
+                 "typed code.")))
+
+
+(pslide
+ #:go (coord .5 .0 'ct)
+ (scale (page->pict "popl16-tfgnvf.pdf") 1.8)
+ #:next
+ #:go (coord .5 .5 'cc)
+ (shadow-frame
+  (vl-append (t/cant "The problem is that, according to our measurements," size3)
+             (t/cant "the cost of enforcing soundness is overwhelming." size3))))
+
+
+
 
 (pic "princess.jpg")
 
-
-(slide (scale (page->pict "popl16-tfgnvf.pdf") 1.8))
 
 (code-colorize-enabled #t)
 ;(slide (langs-pict #t))
