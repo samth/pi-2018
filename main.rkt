@@ -1,7 +1,7 @@
 #lang slideshow
 
 (require slideshow/step slideshow/code slideshow/face 
-         unstable/gui/ppict unstable/gui/pslide
+         ppict/2
          (only-in slideshow/slide title-size)
          "config.ss"
          (except-in "beamer.ss" title) "lib.ss" "thanks.ss" 
@@ -35,15 +35,40 @@
 
 (define (pic fname [r 1])
   (pslide #:go (coord .5 .5 'cc)
-        (scale (bitmap fname) r)))
+          (scale (bitmap fname) r)))
 
 (pslide #:go (coord .5 .5 'cc)
-        (scale (bitmap "Murder_mystery2_large.png") 1))
+        (scale (bitmap "Murder_mystery2_large.png") 1)
+        #:go (coord .05 .5 'lc)
+        (t/kau "A" size1)
+        (t/kau "Murder" size1)
+        (t/kau "Mystery" size1))
 
+
+
+(slide #:layout 'center
+       (vc-append
+        (t/cant "2006" size1)
+        (ht-append (scale (page->pict "siek06__gradual.pdf") .7)
+                   (scale (page->pict "dls06-tf.pdf") .7))
+        (t/cant "Sound Gradual Typing" size1)))
+
+
+(require slideshow/play)
+
+(play-n #:layout 'center
+        #:skip-first? #t
+        (lambda (ts flow titan)
+          (ppict-do full-page
+           #:go (coord .5 .5 'cc)
+           (cellophane (scale (bitmap "typescript.png") .9) ts)
+           #:go (coord .5 .5 'cc)
+           (cellophane (scale (bitmap "flow.png") .9) flow)
+           #:go (coord .5 .5 'cc)
+           (cellophane (scale (bitmap "titan.png") .9) titan))))
 
 (pic "princess.jpg")
 
-(pic "typescript.png" .9)
 
 (slide (scale (page->pict "popl16-tfgnvf.pdf") 1.8))
 
