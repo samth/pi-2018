@@ -15,6 +15,9 @@
 (define (subtitle-pict s)
   (text s (current-title-font) large-text-size))
 
+(define current-tslide-background-pict (make-parameter (bitmap plt-background-path)))
+(provide current-tslide-background-pict)
+
 (define (tslide t . subs)
   (define (row sub)
     (let* ([picts 
@@ -27,10 +30,13 @@
            [gpicts (map ghost picts)]) 
       (apply hbl-append 50 
              (map (lambda (e) (apply cc-superimpose e gpicts)) picts))))
-  (parameterize ([current-background-pict (bitmap plt-background-path)])
+  (parameterize ([current-background-pict (inset (current-tslide-background-pict) -30 -30)])
     (slide #:layout 'center
            (if (null? subs)
-               (if (string? t) (text t (current-title-font) title-text-size) t)
+               (if (string? t)
+                   (colorize (text t (current-title-font) title-text-size)
+                             "white")
+                   t)
                (apply vc-append 0 
                       (append 
                        (map ghost (map row subs))

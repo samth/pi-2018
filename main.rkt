@@ -6,10 +6,18 @@
          "config.ss"
          (except-in "beamer.ss" title) "lib.ss" "thanks.ss" 
          "tslide.ss" "stages.rkt"
-         "helper.rkt" pdf-read
+         "helper.rkt" (prefix-in p: racket-poppler)
          racket/runtime-path rsvg
          (except-in mzlib/etc identity)
          unstable/gui/slideshow)
+
+(define (page->pict pth [page 0])
+  (p:page->pict (p:pdf-page (p:open-pdf pth) page)))
+
+(current-tslide-background-pict
+ (cellophane
+  (scale (bitmap "miraclemax.jpg") .9)
+  .5))
 
 (current-title-background-pict  (pin-over
                                  ;(pin-over
@@ -93,8 +101,10 @@
                  "typed code.")))
 
 
-(slide (quoted "John Clements, ..."
-               '()))
+(slide (quoted "John Clements, January 2016"
+               '("... the resulting dynamic checks"
+                 "will probably cause them to be"
+                 "unacceptably slow.")))
 
 
 (pslide
@@ -146,6 +156,8 @@
  (blank 125)
  (item (t/cant "Hidden Classes for Chaperones" size2)))
 
+(tslide "Tracing to the rescue")
+
 ;(code-colorize-enabled #t)
 
 (slide #:layout 'center
@@ -164,10 +176,101 @@
     (define f* (checked-fn #,(red-code (λ (x) (+ x 1)))
                           Integer Integer))
     (define (f x*)
-      (cast ((checked-fn-call f)
+      (cast ((checked-fn-op f)
              (cast x* (checked-fn-domain f)))
             (checked-fn-range f)))))))
-   
+
+(slide #:title (code (f x))
+       (vl-append
+        (code |var f_code = (checked-fn-op f);|)
+        (code |var f_dom = (checked-fn-domain f);|)
+        (code |var f_rng = (checked-fn-rng f);|)
+        (code ||)
+        (code |guard (integer? x)|)
+        (code ||)
+        (code |var res = x + 1;|)
+        (code |guard (integer? res)|)
+        (code ||)
+        (code |return res;|)))
+
+(slide #:title (code (f x))
+       (vl-append
+        (cellophane (code |var f_code = (checked-fn-op f);|) .3)
+        (cellophane(code |var f_dom = (checked-fn-domain f);|) .3)
+        (cellophane(code |var f_rng = (checked-fn-rng f);|) .3)
+        (code ||)
+        (code |guard (integer? x)|)
+        (code ||)
+        (code |var res = x + 1;|)
+        (code |guard (integer? res)|)
+        (code ||)
+        (code |return res;|)))
+
+(slide #:title (code (f x))
+       (vl-append
+        (cellophane (code |var f_code = (checked-fn-op f);|) .3)
+        (cellophane(code |var f_dom = (checked-fn-domain f);|) .3)
+        (cellophane(code |var f_rng = (checked-fn-rng f);|) .3)
+        (code ||)
+        (code |guard (integer? x)|)
+        (code ||)
+        (code |var res = x + 1;|)
+        (cellophane (code |guard (integer? res)|) .3)
+        (code ||)
+        (code |return res;|)))
+
+(define slowdowns
+  '(("slowdown-gregor-warmup-0.pdf"
+     "slowdown-kcfa-warmup-0.pdf"
+     "slowdown-mbta-warmup-0.pdf")
+    ("slowdown-morsecode-warmup-0.pdf"
+     "slowdown-sieve-warmup-0.pdf"
+     "slowdown-snake-warmup-0.pdf")
+    ("slowdown-suffixtree-warmup-0.pdf"
+     "slowdown-zordoz-warmup-0.pdf"
+     "slowdown-tetris-warmup-0.pdf")))
+
+(slide
+ (apply vc-append 10
+        (for/list ([s slowdowns])
+          (apply
+           hc-append 10
+           (for/list ([f s])
+             (bitmap
+              (pict->bitmap
+               (scale
+                (page->pict
+                 (string-append "../../papers/pycket-papers/oopsla-2017/figs/" f))
+                .5))))))))
+
+
+(pslide
+ #:go (coord .5 .0 'ct)
+ (scale (page->pict "us.pdf") 1.8)
+ #:next
+ #:go (coord .5 .5 'cc)
+ (shadow-frame
+  (vl-append
+   (item "Hidden Classes for Chaperones")
+   (item "Benchmark impacts for all optimizations")
+   (item "Loop finding & wrappers"))))
+
+(play-n #:layout 'center
+        #:skip-first? #t
+        #:steps (cons 1 30)
+        (λ (start westley)
+          (ppict-do full-page
+                    #:go (coord .5 .5 'cc)
+                    (cellophane (scale (bitmap "westley.jpg") .8) (* .8 westley))
+                    #:go (coord .5 .3 'cc)
+                    (colorize (t/kau "Sound Gradual Typing" size1)
+                              (if (= westley 0) "black" "white"))
+                    (blank 35)
+                    (colorize (t/kau "Mostly Dead is Slightly Alive" size1)
+                              (if (= westley 0) "black" "white"))
+                    #:go (coord .5 .7 'cc)
+                    (colorize (t/inc "github.com/pycket" size2)
+                              (if (= westley 0) "black" "white")))))
 
 ;(slide (langs-pict #t))
 
