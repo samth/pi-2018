@@ -12,8 +12,12 @@
          unstable/gui/slideshow)
 (require slideshow/play)
 
-(define (page->pict pth [page 0])
-  (p:page->pict (p:pdf-page (p:open-pdf pth) page)))
+(define (pic fname [r 1])
+  (pslide #:go (coord .5 .5 'cc)
+          (scale (bitmap fname) r)))
+
+(define (page->pict pth [page 0] #:scale [scl 1])
+  (bitmap (scale (p:page->pict (p:pdf-page (p:open-pdf pth) page)) scl)))
 
 (current-title-background-pict  (pin-over
                                  (current-background-pict)
@@ -50,6 +54,8 @@
                 "Caner Derici"
                 )))))
 
+(pic "leo.jpg")
+
 (slide #:title "Papers"
        #:layout 'center
        'alts
@@ -82,9 +88,6 @@
 
 (tslide "Brief Updates")
 
-(define (pic fname [r 1])
-  (pslide #:go (coord .5 .5 'cc)
-          (scale (bitmap fname) r)))
 
 (slide #:title "Reticulated Python"
        (scale (bitmap "lattices.png") .7))
@@ -125,7 +128,7 @@
 
 (pslide
  #:go (coord .5 .0 'ct)
- (scale (page->pict "popl16-tfgnvf.pdf") 1.8)
+ (page->pict "popl16-tfgnvf.pdf" #:scale 1.8)
  #:next
  #:go (coord .5 .5 'cc)
  (shadow-frame
@@ -165,7 +168,7 @@
 
 (slide #:title "Synth, again"
        #:layout 'center
-       (bitmap (scale (page->pict "slowdown-synth-warmup-0.pdf") 1.4)))
+       (page->pict #:scale 1.4 "slowdown-synth-warmup-0.pdf"))
 
 (slide #:title (t/quat "Two Key Ideas" size2)
  (item (t/cant "Tracing JIT Compilation" size2))
@@ -252,17 +255,14 @@
           (apply
            hc-append 10
            (for/list ([f s])
-             (bitmap
-              (pict->bitmap
-               (scale
-                (page->pict
-                 (string-append "../../papers/pycket-papers/oopsla-2017/figs/" f))
-                .5))))))))
+             (page->pict
+              (string-append "../../papers/pycket-papers/oopsla-2017/figs/" f)
+             #:scale .5))))))
 
 
 (pslide
  #:go (coord .5 .0 'ct)
- (scale (page->pict "us.pdf") 1.8)
+ (page->pict #:scale 1.8 "us.pdf")
  #:next
  #:go (coord .5 .5 'cc)
  (shadow-frame
