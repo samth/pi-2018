@@ -38,7 +38,7 @@
                              (if dark?
                                  (bitmap plt-dark-background-path)
                                  (bitmap plt-background-path))))
-(current-title-background-pict (bitmap plt-title-background-path))
+(current-title-background-pict (blank 1024 768))
 (current-base-color "black")
 (current-literal-color "black")
 (current-id-color "black")

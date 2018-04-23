@@ -10,76 +10,92 @@
          racket/runtime-path rsvg
          (except-in mzlib/etc identity)
          unstable/gui/slideshow)
+(require slideshow/play)
 
 (define (page->pict pth [page 0])
   (p:page->pict (p:pdf-page (p:open-pdf pth) page)))
 
-(current-tslide-background-pict
- (cellophane
-  (scale (bitmap "miraclemax.jpg") .9)
-  .5))
-
 (current-title-background-pict  (pin-over
-                                 ;(pin-over
-                                  (current-background-pict)
-                                 ;300 200
-                                 ;; (cellophane (bitmap
-                                 ;;              (load-svg-from-file
-                                 ;;               "Indiana_University_seal.svg" 5))
-                                 ;;             0.1))
-                                 -300 000
+                                 (current-background-pict)
+                                 0 0
                                  (cellophane (bitmap
                                               (load-svg-from-file
-                                               "racket-logo.svg" 2))
-                                             0.3)))
+                                               "Indiana_University_seal.svg" 6))
+                                             0.1)))
                                  
-(title `("Sound Gradual Typing")
-        `("Only Mostly Dead")
-        `(("Spenser Bauman" "Mathworks")
-         ("Carl Friedrich Bolz-Tiereck" "Heinrich-Heine-Universität Düsseldorf")
-         ("Jeremy Siek" "Indiana University")
-          ("Sam Tobin-Hochstadt" "Indiana University"))
-        "OOPSLA 2017")
+(title `("Optimizing and Inferring""Gradual Types")
+       `("The View from Indiana")
+        '()
+        "Boston, 2018")
+
+(tslide "The project at IU")
+
+(slide #:title "People"
+       (ht-append 60
+        (apply vl-append
+         (map t/quat
+              '("Matteo Cimini"
+                "David Christiansen"
+                "Spenser Bauman"
+                "David Kempe"
+                "Earl Dean")))
+        (apply vl-append
+         (map t/quat
+              '("Ambrose Bonnaire-Sergeant"
+                "Andrew Kent"
+                "Andre Kuhlenschmit"
+                "Deyaaeldeen Almahallawi"
+                "Michael Vitousek"
+                "Sarah Spall"
+                "Caner Derici"
+                )))))
+
+(slide #:title "Papers"
+       #:layout 'center
+       'alts
+       (map (compose list
+                     bitmap
+                     (lambda (x) (scale x 0.8))
+                     page->pict
+                     (lambda (x) (string-append "../../papers/" x)))
+            '("pycket-papers/oopsla-2017/paper.pdf"
+              "pycket-papers/icfp-2015/pycket.pdf"
+              "esop16-short.pdf"
+              "icfp17-main102.pdf"
+              "1802.06375.pdf"
+              "p762-vitousek.pdf"
+              "p789-cimini.pdf"
+              "trpp-pldi-2016/kkth-pldi-2016.pdf")))
+
+(slide #:title "Software"
+       (scale
+        (apply vl-append
+               (map t/quat
+                    '("Typed Racket"
+                      "Reticulated Python"
+                      "Typed Clojure"
+                      "Grift"
+                      "Pycket"
+                      "Gradualizer")))
+        1.6))
+        
+
+(tslide "Brief Updates")
 
 (define (pic fname [r 1])
   (pslide #:go (coord .5 .5 'cc)
           (scale (bitmap fname) r)))
 
-(pslide #:go (coord .5 .5 'cc)
-        (scale (bitmap "Murder_mystery2_large.png") 1)
-        #:go (coord .05 .5 'lc)
-        (t/kau "A" size1)
-        (t/kau "Murder" size1)
-        (t/kau "Mystery" size1))
+(slide #:title "Reticulated Python"
+       (scale (bitmap "lattices.png") .7))
+
+(slide #:title "Typed Clojure"
+       (scale (bitmap "spec.png") .7))
 
 
+(define (tr-slow)
 
-(slide #:layout 'center
-       (vc-append
-        (t/cant "2006" size1)
-        (ht-append (scale (page->pict "siek06__gradual.pdf") .7)
-                   (scale (page->pict "dls06-tf.pdf") .7))
-        (t/cant "Sound Gradual Typing" size1)))
-
-
-(require slideshow/play)
-
-(play-n #:layout 'center
-        #:skip-first? #t
-        (λ (ts flow titan unsound)
-          (ppict-do full-page
-           #:go (coord .5 .5 'cc)
-           (cellophane (scale (bitmap "typescript.png") .9) ts)
-           #:go (coord .5 .5 'cc)
-           (cellophane (scale (bitmap "flow.png") .9) flow)
-           #:go (coord .5 .5 'cc)
-           (cellophane (scale (bitmap "titan.png") .9) titan)
-           #:go (coord .5 .5 'cc)
-           (if (= unsound 1)
-               (rotate (shadow-frame (t/cant "All Unsound!" size1)) .5)
-               (blank 1)))))
-
-(tslide "But Why?")
+(tslide "Typed Racket has a problem")
 
 (define (quoted author ts)
   (vr-append (apply vl-append (for/list ([t ts])
@@ -255,6 +271,7 @@
    (item "Benchmark impacts for all optimizations")
    (item "Loop finding & wrappers"))))
 
+#;
 (play-n #:layout 'center
         #:skip-first? #t
         #:steps (cons 1 30)
@@ -271,9 +288,18 @@
                     #:go (coord .5 .7 'cc)
                     (colorize (t/inc "github.com/pycket" size2)
                               (if (= westley 0) "black" "white")))))
-
+)
 ;(slide (langs-pict #t))
 
 (define (titlet s)
   (t/quat s size2))
 
+(tr-slow)
+
+(slide #:title "Pycket Status"
+       (t "Adapting to changes in Racket")
+       (t "Adding features to become realistic")
+       (blank 100)
+       (t "Led by Caner Derici"))
+
+(pic "maxresdefault.jpg" .8)

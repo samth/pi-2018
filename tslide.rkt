@@ -15,7 +15,7 @@
 (define (subtitle-pict s)
   (text s (current-title-font) large-text-size))
 
-(define current-tslide-background-pict (make-parameter (bitmap plt-background-path)))
+(define current-tslide-background-pict (make-parameter (blank 1024 768)))
 (provide current-tslide-background-pict)
 
 (define (tslide t . subs)
@@ -35,7 +35,7 @@
            (if (null? subs)
                (if (string? t)
                    (colorize (text t (current-title-font) title-text-size)
-                             "white")
+                             "black")
                    t)
                (apply vc-append 0 
                       (append 
